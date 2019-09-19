@@ -24,6 +24,21 @@ Django rest framework + vue 的CMDB项目
 
 ![image](https://github.com/myide/open-cmdb/blob/master/images/dashboard.png)
 
+- 机房列表
+
+![image](https://github.com/myide/open-cmdb/blob/master/images/idc.png)
+
+- 项目信息
+
+![image](https://github.com/myide/open-cmdb/blob/master/images/project_info.png)
+
+- 服务器详情
+
+![image](https://github.com/myide/open-cmdb/blob/master/images/server_detail.png)
+
+- WebSSH
+
+![image](https://github.com/myide/open-cmdb/blob/master/images/webssh.png)
 
 
 ## 交流学习
