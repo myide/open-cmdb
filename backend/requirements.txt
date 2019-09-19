@@ -8,7 +8,7 @@ gunicorn==19.9.0
 channels==2.2.0
 channels-redis==2.4.0
 paramiko==2.4.1
-django==2.0.8
+django==2.0.12
 djangorestframework==3.8.2
 django-filter==2.0.0
 django-rest-swagger==2.1.1
