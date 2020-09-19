@@ -9,11 +9,19 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
+import datetime
+import os
+
 import pymysql
+
 pymysql.install_as_MySQLdb()
 
-import os
-import datetime
+# 本机的ssh免密用户
+LOCAL_SSH_USER = 'usera'
+KEY_FILE = '/home/{}/.ssh/id_rsa'.format(LOCAL_SSH_USER)
+if not os.path.isfile(KEY_FILE):
+    print('用户{}的秘钥不存在，请提前生成'.format(LOCAL_SSH_USER))
+    os._exit(1)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -104,7 +112,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'account',
-    'category'
+    'category',
+    'history'
 ]
 
 ASGI_APPLICATION = 'category.routing.application'
@@ -177,6 +186,14 @@ WSGI_APPLICATION = 'open-cmdb.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+'''
+DATABASES = {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cmdb',
         'USER': 'root',
@@ -186,6 +203,7 @@ DATABASES = {
         'OPTIONS': {'charset':'utf8mb4'},
     },
 }
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -317,4 +335,3 @@ LOGGING = {
         }
     },
 }
-

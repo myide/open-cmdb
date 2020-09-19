@@ -39,3 +39,42 @@ export const DeleteServer = (id) => {
     method: 'delete'
   })
 }
+
+export const FetchServerInfo = (id) => {
+  return axios.request({
+    url: serverUrl + id + '/info/',
+    method: 'get'
+  })
+}
+
+export const FetchServerCron = (id, data) => {
+  return axios.request({
+    url: serverUrl + id + '/fetch_cron_content/',
+    method: 'post',
+    data: data
+  })
+}
+
+export const FetchServerCronLog = (id, data) => {
+  return axios.request({
+    url: serverUrl + id + '/fetch_cron_log/',
+    method: 'post',
+    data: data
+  })
+}
+
+export const UpdateServerCron = (id, data) => {
+  return axios.request({
+    url: serverUrl + id + '/update_cron_file/',
+    method: 'post',
+    data: data
+  })
+}
+
+export const SyncServerCron = (id, data) => {
+  return axios.request({
+    url: serverUrl + id + '/sync_cron_file/',
+    method: 'post',
+    data: data
+  })
+}

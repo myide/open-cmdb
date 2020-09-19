@@ -3,7 +3,7 @@
     <Card>
       <Row>
         <Col span="4">
-          <Input search v-model="getParams.search" placeholder="搜索" @on-click="handleGetUserList" @on-enter="handleGetUserList" />
+          <Input search v-model="getParams.search" placeholder="搜索" @on-search="handleGetUserList" />
         </Col>
 
         <Col span="10">

@@ -2,11 +2,13 @@
 export const alertWarning = (action, notice, name_id) => {
   let action_map = {
     'create': '创建',
-    'update': '修改',
-    'delete': '删除'
+    'update': '更新',
+    'delete': '删除',
+    'fetchInfo': '采集信息',
+    'sync': '同步信息'
   }
   let action_desc = action_map[action]
-  notice.warning({
+  notice.success({
     title: action_desc,
     duration: 6,
     render: h => {

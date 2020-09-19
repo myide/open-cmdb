@@ -14,7 +14,7 @@
       <Card>
       <Row>
         <Col span="4">
-          <Input search v-model="getParams.search" placeholder="搜索" @on-click="handleGetList" @on-enter="handleGetList" />
+          <Input search v-model="getParams.search" placeholder="搜索" @on-search="handleGetList" />
         </Col>
 
         <Col span="10">
@@ -25,7 +25,7 @@
       </Row>
       </br>
       <Row>
-        <Col span="23">
+        <Col span="24">
           <Table :columns="columnsDataList" :data="dataList" size="small"></Table>
         </Col>
       </Row>
@@ -48,7 +48,7 @@
           <Col span="22">
             <Form ref="createForm" :model="createForm" :rules="ruleForm" :label-width="100">
               <FormItem label="SSH用户名：" prop="name">
-                <Input v-model="createForm.name" placeholder="SSH用户名"></Input>
+                <Input v-model="createForm.name" placeholder="远程服务器的SSH用户名"></Input>
               </FormItem>
               <FormItem label="SSH密码：" prop="password">
                 <Input type="password" v-model="createForm.password" placeholder="SSH密码"></Input>
@@ -57,6 +57,19 @@
                 <Input v-model="createForm.remark" placeholder="备注"></Input>
               </FormItem>
             </Form>
+            <Alert show-icon>SSH免密建议</Alert>
+            <div>
+            本机SSH用户{{ localSSHUser }}, 远程服务器SSH用户{{ createForm.name }}
+            </div>
+            <div>
+            建议做本机对远程服务器的SSH免密登录:
+            </div>
+            <div>
+            1. 通过ssh-copy-id或手工复制的方式，把本地用户{{ localSSHUser }}的id_rsa.pub内容追加到远程用户{{ createForm.name }}的authorized_keys 
+            </div>
+            <div>
+            2. 把远程用户{{ createForm.name }}加入sudoers，并设置免密sudo
+            </div>
           </Col>
         </Row>
       </div>
@@ -103,7 +116,7 @@
 <script>
   import copyright from '@/view/components/public/copyright.vue'
   import {Button, Table, Modal, Message, Tag} from 'iview';
-  import {GetSSHUserList, CreateSSHUser, UpdateSSHUser, DeleteSSHUser} from '@/api/category/sshusers'
+  import {GetSSHUserList, CreateSSHUser, UpdateSSHUser, DeleteSSHUser, GetLocalSSHUser} from '@/api/category/sshusers'
   import {alertWarning} from '@/libs/view/common'
 
   export default {
@@ -114,6 +127,7 @@
       deleteModal:false,
       createModal:false,
       updateModal:false,
+      localSSHUser:'',
       search:'',
       dataList:[],
       deleteData:{
@@ -203,6 +217,7 @@
 
     created () {
       this.handleGetList()
+      this.handleGetLocalSSHUser()
     },
 
     methods: {
@@ -213,6 +228,15 @@
           res => {
             this.dataList = res.data.results
             this.total = res.data.count
+          }
+        )
+      },
+
+      handleGetLocalSSHUser () {
+        GetLocalSSHUser({})
+        .then(
+          res => {
+            this.localSSHUser = res.data.data
           }
         )
       },

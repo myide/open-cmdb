@@ -11,9 +11,8 @@ class BaseModel(models.Model):
     update_time = models.DateTimeField(auto_now=True, verbose_name='修改时间')
     remark = models.TextField(default='', null=True, blank=True, verbose_name='备注')
 
-    def __unicode__(self):
-        return self.name
+    def __str__(self):
+        return '{}'.format(self.name)
 
     class Meta:
         abstract = True
-        ordering = ['-id']

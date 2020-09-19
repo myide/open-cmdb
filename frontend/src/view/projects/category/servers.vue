@@ -14,7 +14,7 @@
       <Card>
       <Row>
         <Col span="4">
-          <Input search v-model="getParams.search" placeholder="搜索" @on-click="handleGetList" @on-enter="handleGetList" />
+          <Input search v-model="getParams.search" placeholder="主机名/SSH地址" @on-search="handleGetList" />
         </Col>
 
         <Col span="10">
@@ -25,7 +25,7 @@
       </Row>
       </br>
       <Row>
-        <Col span="23">
+        <Col span="24">
           <Table :columns="columnsDataList" :data="dataList" size="small"></Table>
         </Col>
       </Row>
@@ -57,21 +57,13 @@
                   <Option v-for="item in rackList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                 </Select>
               </FormItem>
-              <FormItem label="服务器类型：">
-                <Select v-model="createForm.server_type">
-                  <Option v-for="item in serverTypeList" :value="item" :key="item">{{ item }}</Option>
-                </Select>
-              </FormItem>
-              <FormItem label="主机名：" prop="name">
-                <Input v-model="createForm.name" placeholder="主机名"></Input>
-              </FormItem>
               <FormItem label="业务用户：">
                 <Select v-model="createForm.users" multiple>
                   <Option v-for="item in userList" :value="item.id" :key="item.id">{{ item.username }}</Option>
                 </Select>
               </FormItem>
               <FormItem label="SSH用户：">
-                <Select v-model="createForm.ssh_users" multiple>
+                <Select v-model="createForm.ssh_user">
                   <Option v-for="item in sshUserList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                 </Select>
               </FormItem>
@@ -80,24 +72,6 @@
               </FormItem>
               <FormItem label="SSH 端口：" prop="ssh_port">
                 <Input v-model="createForm.ssh_port" placeholder="SSH IP端口（留空默认为22）"></Input>
-              </FormItem>
-              <FormItem label="UUID：" prop="uuid">
-                <Input v-model="createForm.uuid" placeholder="UUID"></Input>
-              </FormItem>
-              <FormItem label="CPU：">
-                <Input v-model="createForm.cpu" placeholder="CPU"></Input>
-              </FormItem>
-              <FormItem label="内存：">
-                <Input v-model="createForm.memory" placeholder="内存"></Input>
-              </FormItem>
-              <FormItem label="磁盘：">
-                <Input v-model="createForm.disk" placeholder="磁盘"></Input>
-              </FormItem>
-              <FormItem label="运行状态：" prop="status">
-                <RadioGroup v-model="createForm.status">
-                    <Radio label="在线"></Radio>
-                    <Radio label="下线"></Radio>
-                </RadioGroup>
               </FormItem>
               <FormItem label="备注：">
                 <Input v-model="createForm.remark" placeholder="备注"></Input>
@@ -111,7 +85,7 @@
     <Modal
       v-model="updateModal"
       width="500"
-      title="修改服务器"
+      :title="'修改服务器 (ID: ' + updateForm.id + ')'"
       @on-ok="handleUpdate"
       @on-cancel="cancel">
       <div class="formcontent">
@@ -128,21 +102,13 @@
                   <Option v-for="item in rackList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                 </Select>
               </FormItem>
-              <FormItem label="服务器类型：">
-                <Select v-model="updateForm.server_type">
-                  <Option v-for="item in serverTypeList" :value="item" :key="item">{{ item }}</Option>
-                </Select>
-              </FormItem>
-              <FormItem label="主机名：" prop="name">
-                <Input v-model="updateForm.name" placeholder="主机名"></Input>
-              </FormItem>
               <FormItem label="业务用户：">
                 <Select v-model="updateForm.users" multiple>
                   <Option v-for="item in userList" :value="item.id" :key="item.id">{{ item.username }}</Option>
                 </Select>
               </FormItem>
               <FormItem label="SSH用户：">
-                <Select v-model="updateForm.ssh_users" multiple>
+                <Select v-model="updateForm.ssh_user">
                   <Option v-for="item in sshUserList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                 </Select>
               </FormItem>
@@ -151,24 +117,6 @@
               </FormItem>
               <FormItem label="SSH 端口：" prop="ssh_port">
                 <Input v-model="updateForm.ssh_port" placeholder="SSH IP端口（留空默认为22）"></Input>
-              </FormItem>
-              <FormItem label="UUID：" prop="uuid">
-                <Input v-model="updateForm.uuid" placeholder="UUID"></Input>
-              </FormItem>
-              <FormItem label="CPU：">
-                <Input v-model="updateForm.cpu" placeholder="CPU"></Input>
-              </FormItem>
-              <FormItem label="内存：">
-                <Input v-model="updateForm.memory" placeholder="内存"></Input>
-              </FormItem>
-              <FormItem label="磁盘：">
-                <Input v-model="updateForm.disk" placeholder="磁盘"></Input>
-              </FormItem>
-              <FormItem label="运行状态：" prop="status">
-                <RadioGroup v-model="updateForm.status">
-                    <Radio label="在线"></Radio>
-                    <Radio label="下线"></Radio>
-                </RadioGroup>
               </FormItem>
               <FormItem label="备注：" prop="remark">
                 <Input v-model="updateForm.remark"></Input>
@@ -182,7 +130,7 @@
     <Modal
       v-model="deleteModal"
       width="450"
-      title="删除服务器"
+      :title="'删除服务器 (ID: ' + deleteData.id + ')'"
       @on-ok="handleDelete"
       @on-cancel="cancel">
       <div>
@@ -191,20 +139,13 @@
     </Modal>
 
     <Modal
-      v-model="daqModal"
-      width="600"
-      title="采集信息">
+      v-model="fetchServerInfoModal"
+      width="450"
+      :title="'采集服务器信息 (ID: ' + serverInfoData.id + ')'"
+      @on-ok="handleFetchServerInfo"
+      @on-cancel="cancel">
       <div>
-        <div v-for="(value,key) in daq" :value="value" :key="key">
-          <Row>
-            <Col span="6">
-              <b>{{key}}: </b>
-            </Col>
-            <Col span="18">
-              <span>{{value}}</span>
-            </Col>
-          </Row>
-        </div>
+        <p>确认采集服务器（{{serverInfoData.name}}）信息?</p>
       </div>
     </Modal>
 
@@ -216,7 +157,7 @@
   import copyright from '@/view/components/public/copyright.vue'
   import {GetUserList} from '@/api/account/users'
   import {GetSSHUserList} from '@/api/category/sshusers'
-  import {GetServerList, CreateServer, UpdateServer, DeleteServer} from '@/api/category/servers'
+  import {GetServerList, CreateServer, UpdateServer, DeleteServer, FetchServerInfo} from '@/api/category/servers'
   import {GetIdcList, GetIdc} from '@/api/category/idcs'
   import {GetRackList} from '@/api/category/racks'
   import {alertWarning} from '@/libs/view/common'
@@ -226,17 +167,20 @@
     data () {
       return {
       spinShow:false,
-      daqModal:false,
       deleteModal:false,
       createModal:false,
       updateModal:false,
-      daq:'',
+      fetchServerInfoModal:false,
       idc:'',
       search:'',
       idcList:[],
       rackList:[],
       dataList:[],
       deleteData:{
+        id:'',
+        name:''
+      },
+      serverInfoData:{
         id:'',
         name:''
       },
@@ -250,48 +194,28 @@
       createForm:{
         idc:'',
         users:[],
-        ssh_users:[],
+        ssh_user:'',
         ssh_ip:'',
         ssh_port:'22',
         rack:'',
-        name:'',
-        server_type:'',
-        uuid:'',
-        cpu:'',
-        memory:'',
-        disk:'',
-        status:'在线',
         remark:''
       },
       updateForm:{
         id:'',
         idc:'',
         users:[],
-        ssh_users:[],
+        ssh_user:'',
         ssh_ip:'',
         ssh_port:'',
         rack:'',
-        name:'',
-        server_type:'',
-        uuid:'',
-        cpu:'',
-        memory:'',
-        disk:'',
-        status:'',
         remark:''
       },
       ruleForm: {
-        name: [{ required: true, message: '主机名不能为空', trigger: 'blur' }],
-        uuid: [{ required: true, message: 'UUID不能为空', trigger: 'blur' }],
-        cpu: [{ required: true, message: 'CPU不能为空', trigger: 'blur' }],
-        memory: [{ required: true, message: '内存不能为空', trigger: 'blur' }],
-        disk: [{ required: true, message: '磁盘不能为空', trigger: 'blur' }],
-        status: [{ required: true, message: '状态不能为空', trigger: 'blur' }],
       },
       columnsDataList: [
         {
           title: 'ID',
-          width: 80,
+          width: 60,
           render: (h, params) => {
             return h('router-link', {props:{to:'/category/servers/'+params.row.id}}, params.row.id)
           }
@@ -301,12 +225,18 @@
           key: 'name'
         },
         {
+          title: 'SSH地址',
+          key: 'ssh_ip',
+          width: 120,
+        },
+        {
           title: '所属机柜',
-          key: 'rack_name'
+          key: 'rack_name',
+          width: 100,
         },
         {
           title: '服务器类型',
-          key: 'server_type'
+          key: 'system_product'
         },
         {
           title: '状态',
@@ -326,31 +256,8 @@
           key: 'remark'
         },
         {
-          title: '采集数据',
-          width: 100,
-          render: (h, params) => {
-            return h('div', [
-              h(Button, {
-                props: {
-                  type: 'info',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    const row = params.row
-                    this.daqModal = true
-                    let daq = row.daq
-                    this.daq = JSON.parse(daq)
-                    console.log(daq)
-                  }
-                }
-              }, '查看')
-            ])
-          },
-        },
-        {
           title: '操作',
-          width: 150,
+          width: 210,
           align: 'center',
           render: (h, params) => {
             return h('div', [
@@ -371,22 +278,11 @@
                     for (let u of row.users){
                       this.updateForm.users.push(u.id)
                     }
-                    this.updateForm.ssh_users = []
-                    for (let u of row.ssh_users){
-                      this.updateForm.ssh_users.push(u.id)
-                    }
+                    this.updateForm.ssh_user = row.ssh_user.id
                     this.updateForm.ssh_ip = row.ssh_ip
                     this.updateForm.ssh_port = row.ssh_port
                     this.updateForm.idc = row.idc
                     this.updateForm.rack = row.rack
-                    this.updateForm.name = row.name
-                    this.updateForm.server_type = row.server_type
-                    this.updateForm.uuid = row.uuid
-                    this.updateForm.cpu = row.cpu
-                    this.updateForm.memory = row.memory
-                    this.updateForm.disk = row.disk
-                    this.updateForm.cpu = row.cpu
-                    this.updateForm.status = this.status_map[row.status]
                     this.updateForm.remark = row.remark
                     this.handleGetListRacks(row.idc)
                   }
@@ -397,6 +293,9 @@
                   type: 'error',
                   size: 'small'
                 },
+                style: {
+                  marginRight: '12px'
+                },
                 on: {
                   click: () => {
                     this.deleteModal = true
@@ -404,7 +303,20 @@
                     this.deleteData.name = params.row.name
                   }
                 }
-              }, '删除')
+              }, '删除'),
+              h(Button, {
+                props: {
+                  type: 'success',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.fetchServerInfoModal = true
+                    this.serverInfoData.id = params.row.id
+                    this.serverInfoData.name = params.row.name
+                  }
+                }
+              }, '采集')
             ])
           }
         },
@@ -420,13 +332,6 @@
         pagesize:1000,
         search:'',
       },
-      status_map:{
-        '0':'下线',
-        '1':'在线',
-        '下线':'0',
-        '在线':'1'
-      },
-
       }
     },
 
@@ -482,7 +387,7 @@
         GetSSHUserList(this.getMaxParams)
         .then(
           res => {
-            this.createForm.ssh_users = []
+            this.createForm.ssh_user = ''
             this.sshUserList = res.data.results
           }
         )
@@ -504,12 +409,11 @@
             return
           }
           let data = JSON.parse(JSON.stringify(this.createForm))  // 深拷贝
-          data.status = this.status_map[data.status]
           CreateServer(data)
           .then(
             res => {
               this.handleGetList()
-              alertWarning('create', this.$Notice, data.name)
+              alertWarning('create', this.$Notice, '')
             },
           )
         })
@@ -522,7 +426,6 @@
           }
           let id = this.updateForm.id
           let data = JSON.parse(JSON.stringify(this.updateForm))  // 深拷贝
-          data.status = this.status_map[data.status]
           UpdateServer(id, data)
           .then(
             res => {
@@ -539,6 +442,15 @@
         .then (res => {
           this.handleGetList()
           alertWarning('delete', this.$Notice, id)
+        })
+      },
+
+      handleFetchServerInfo () {
+        let id = this.serverInfoData.id
+        FetchServerInfo(id)
+        .then (res => {
+          this.handleGetList()
+          alertWarning('fetchInfo', this.$Notice, id)
         })
       },
 

@@ -1,7 +1,7 @@
-from django.db import models
-from account.models import User
-
 # Create your models here.
+from django.db import models
+
+from account.models import User
 from utils.basemodels import BaseModel
 
 
@@ -42,20 +42,19 @@ class Server(BaseModel):
     )
     users = models.ManyToManyField(User, default='', null=True, blank=True, verbose_name='业务相关的用户')
     rack = models.ForeignKey(Rack, default='', null=True, blank=True, on_delete=models.SET_DEFAULT, verbose_name='所属机柜')
-    ssh_users = models.ManyToManyField(SSHUser, default='', null=True, blank=True, verbose_name='SSH 用户')
+    ssh_user = models.ForeignKey(SSHUser, default='', null=True, blank=True, on_delete=models.SET_DEFAULT, verbose_name='SSH用户')
     ssh_ip = models.CharField(default='', max_length=128, null=True, blank=True, verbose_name='SSH IP地址/主机名')
     ssh_port = models.IntegerField(default=22, max_length=5, null=True, blank=True, verbose_name='SSH 端口')
     uuid = models.CharField(default='', max_length=128, null=True, blank=True, verbose_name='UUID')
     cpu = models.CharField(default='', max_length=64, null=True, blank=True, verbose_name='CPU')
     memory = models.CharField(default='', max_length=64, null=True, blank=True, verbose_name='内存')
     disk = models.CharField(default='', max_length=64, null=True, blank=True, verbose_name='磁盘大小')
-    server_type = models.CharField(default='', max_length=128, null=True, blank=True, verbose_name='服务器类型')
+    system_product = models.CharField(default='', max_length=128, null=True, blank=True, verbose_name='服务器类型')
     daq = models.TextField(default='', null=True, blank=True, verbose_name='数据采集')
     status = models.CharField(default='1', max_length=2, choices=STATUS, verbose_name='运行状态')
 
     class Meta:
         ordering = ['-id']
-        unique_together = ('uuid', 'server_type')
 
 
 class BusinessLine(BaseModel):

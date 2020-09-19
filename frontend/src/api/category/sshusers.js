@@ -1,6 +1,7 @@
 import axios from '@/libs/api.request'
 
 const sshUserUrl = '/api/category/sshusers/'
+const LocalSSHUserUrl = '/api/category/api_local_ssh_user/'
 
 export const GetSSHUserList = (params) => {
   return axios.request({
@@ -37,5 +38,12 @@ export const DeleteSSHUser = (id) => {
   return axios.request({
     url: sshUserUrl + id + '/',
     method: 'delete'
+  })
+}
+
+export const GetLocalSSHUser = (data) => {
+  return axios.request({
+    url: LocalSSHUserUrl,
+    method: 'get'
   })
 }

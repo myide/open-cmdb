@@ -14,7 +14,7 @@
       <Card>
       <Row>
         <Col span="4">
-          <Input search v-model="getParams.search" placeholder="搜索" @on-click="handleGetList" @on-enter="handleGetList" />
+          <Input search v-model="getParams.search" placeholder="机柜名" @on-search="handleGetList" />
         </Col>
 
         <Col span="10">
@@ -25,7 +25,7 @@
       </Row>
       </br>
       <Row>
-        <Col span="23">
+        <Col span="24">
           <Table :columns="columnsDataList" :data="dataList" size="small"></Table>
         </Col>
       </Row>

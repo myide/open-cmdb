@@ -59,7 +59,6 @@ export default {
             duration: 3
         });
       })
-
     },
     handleSubmit ({ userName, password, loginType}) {
         if (loginType == 'unified') {
@@ -75,5 +74,4 @@ export default {
 </script>
 
 <style>
-
 </style>

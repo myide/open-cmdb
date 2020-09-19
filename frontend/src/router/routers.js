@@ -221,5 +221,38 @@ export default [
         component: () => import('@/view/projects/account/groups.vue')
       }
     ]
-  }
+  },
+
+  {
+    path: '/history',
+    name: 'history',
+    meta: {
+      icon: 'md-person',
+      title: 'history'
+    },
+    component: Main,
+    children: [
+      {
+        path: 'histories',
+        name: 'histories',
+        meta: {
+          icon: 'ios-person',
+          title: 'histories'
+        },
+        component: () => import('@/view/projects/history/histories.vue')
+      },
+      {
+        path: '/history/histories/:id',
+        name: 'history_detail',
+        meta: {
+          hideInMenu: true,
+          icon: 'ios-document',
+          title: 'history_detail'
+        },
+        component: () => import('@/view/projects/history/history_detail.vue')
+      },
+
+    ]
+  },
+
 ]

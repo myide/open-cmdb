@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import time
 import logging
+import time
 from functools import wraps
+
 from django.db import close_old_connections
 from rest_framework.exceptions import ParseError
 from rest_framework.exceptions import PermissionDenied

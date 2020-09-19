@@ -1,5 +1,5 @@
 export default {
-  home: '首页',
+  home: 'Dashboard',
   login: '登录',
   components: '组件',
   count_to_page: '数字渐变',
@@ -57,5 +57,7 @@ export default {
   projects: '项目',
   account: '用户和组',
   users: '用户管理',
-  groups: '组管理'
+  groups: '组管理',
+  histories: '历史记录',
+  history_detail: '历史详情'
 }

@@ -1,8 +1,9 @@
 # In routing.py
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter
+from channels.routing import URLRouter
 from django.urls import path
-from .consumers import *
 
+from category.ssh.webssh_consumers import WebSSH
 
 application = ProtocolTypeRouter({
     "websocket": URLRouter([

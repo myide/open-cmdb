@@ -15,12 +15,13 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
-
+from django.urls import include
+from django.urls import path
 # swagger pakeage
 from rest_framework.schemas import get_schema_view
-from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
 from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_swagger.renderers import OpenAPIRenderer
+from rest_framework_swagger.renderers import SwaggerUIRenderer
 
 schema_view = get_schema_view(title='Users API', renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
 
@@ -30,5 +31,6 @@ urlpatterns = [
     path('api/api-auth/', include('rest_framework.urls', namespace='rest_framework')),  # wagger login
     path('api/api-token-auth/', obtain_jwt_token),
     path('api/account/', include('account.urls')),
-    path('api/category/', include('category.urls'))
+    path('api/category/', include('category.urls')),
+    path('api/history/', include('history.urls')),
 ]

@@ -79,7 +79,52 @@
               <p> <b>类型：</b> </p>
             </Col>
             <Col span="19">
-              <p> {{row.server_type}} </p>
+              <p> {{row.system_product}} </p>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span="5">
+              <p> <b>SSH 用户：</b> </p>
+            </Col>
+            <Col span="19">
+              <p> {{updateCron.name}} </p>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span="5">
+              <p> <b>SSH 地址/端口：</b> </p>
+            </Col>
+            <Col span="19">
+              <p> {{row.ssh_ip}} / {{row.ssh_port}} </p>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span="5">
+              <p> <b>SSH连接：</b> </p>
+            </Col>
+            <Col span="19">
+              <p> <router-link :to="get_webssh_url"> 连接 </router-link> </p>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span="5">
+              <p> <b>创建时间：</b> </p>
+            </Col>
+            <Col span="19">
+              <p> {{row.create_time | parseTime}} </p>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span="5">
+              <p> <b>修改时间：</b> </p>
+            </Col>
+            <Col span="19">
+              <p> {{row.update_time | parseTime}} </p>
             </Col>
           </Row>
 
@@ -92,29 +137,6 @@
             </Col>
           </Row>
 
-          <Row>
-            <Col span="5">
-              <p> <b>SSH 地址：</b> </p>
-            </Col>
-            <Col span="19">
-              <p> {{row.ssh_ip}} </p>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col span="5">
-              <p> <b>SSH连接：</b> </p>
-            </Col>
-            <Col span="10">
-              <Select v-model="user" placeholder="请选择SSH用户">
-                <Option v-for="item in ssh_users" :value="item.id" :key="item.id">{{ item.name }}</Option>
-              </Select>
-            </Col>
-            <Col span="9">
-              <p style="text-align:center" v-if="user"> <router-link :to="get_webssh_url"> 连接 </router-link> </p>
-            </Col>
-          </Row>
-
         </div>
       </Card>
     </Col>
@@ -123,23 +145,8 @@
       <Card>
         <Tabs>
           
-          <TabPane label="采集信息">
-            <div style="margin-top:10px;margin-bottom:10px">
-              <div v-for="(value,key) in daq" :value="value" :key="key">
-                <Row>
-                  <Col span="6">
-                    <b>{{key}}: </b>
-                  </Col>
-                  <Col span="18">
-                    <span>{{value}}</span>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </TabPane>
-          
           <TabPane label="相关用户">
-            <div style="margin-top:10px;margin-bottom:10px">
+            <div>
               <div class="modalcontent">
                 <Table :columns="columnsUserList" :data="row.users" size="small"></Table>
               </div>
@@ -147,12 +154,30 @@
           </TabPane>
 
           <TabPane label="相关项目">
-            <div style="margin-top:10px;margin-bottom:10px">
+            <div>
               <div class="modalcontent">
                 <Table :columns="columnsProjectList" :data="row.projects" size="small"></Table>
               </div>
             </div>
           </TabPane>
+
+          <TabPane label="定时任务">
+            <Row>
+              <Col span="24">
+                <div style="margin-bottom:10px">
+                  <i-input type="textarea" :rows="10" v-model="updateCron.content" placeholder="请输入..."></i-input>
+                </div>
+              </Col>
+              <div>
+              <ButtonGroup>
+                <Button @click="handleUpdateServerCron">保存</Button>
+                <Button @click="handleSyncServerCron">同步</Button>
+                <Button @click="handleFetchServerCronLog">日志</Button>
+              </ButtonGroup>
+              </div>
+            </Row>
+          </TabPane>
+
         </Tabs>
 
       </Card>
@@ -162,13 +187,49 @@
     <copyright> </copyright>
 
     <Modal
-      v-model="sshuserModal"
-      width="600"
-      title="选择SSH用户">
+      v-model="cronLogModal"
+      width="900"
+      title="cron日志"
+      @on-ok=""
+      @on-cancel="">
+      <div style="height: 500px; overflow-y:scroll; background:#000; color:#FFF">
+        <pre>{{cronlog}}</pre>
+      </div>
+    </Modal>
+
+    <Modal
+      v-model="cronSyncModal"
+      width="900"
+      title="cron同步"
+      @on-ok="handleSyncCron"
+      @on-cancel="">
       <div>
-        <Select v-model="user">
-          <Option v-for="item in ssh_users" :value="item.id" :key="item.id">{{ item.name }}</Option>
-        </Select>
+        <Row>
+          <Col span="2">选择项目</Col>
+          <Col span="22">
+            <RadioGroup v-model="project" @on-change="getProjectHosts">
+              <Radio v-for="item in projects" :label="item.id">{{item.name}}</Radio>
+            </RadioGroup>
+          </Col>
+        </Row>
+        <br>
+        <div>
+          <Row>
+            <Col span="2">选择主机</Col>
+            <Col span="22">
+              <div style="border-bottom: 1px solid #e9e9e9;padding-bottom:6px;margin-bottom:6px;">
+                  <Checkbox
+                      :indeterminate="indeterminate"
+                      :value="checkAll"
+                      @click.prevent.native="handleCheckAll">全选</Checkbox>
+              </div>
+            </Col>
+          </Row>
+          <CheckboxGroup v-model="checkAllGroup" @on-change="checkAllGroupChange">
+            <Checkbox v-for="item in projectServers" :label="item.id">{{item.ssh_ip}}</Checkbox>
+          </CheckboxGroup>
+        </div>
+
       </div>
     </Modal>
 
@@ -176,8 +237,12 @@
 </template>
 
 <script>
+import {Button} from 'iview';
 import copyright from '@/view/components/public/copyright.vue'
-import {GetServer} from '@/api/category/servers'
+import {GetServer, FetchServerCron, FetchServerCronLog, UpdateServerCron, SyncServerCron} from '@/api/category/servers'
+import {GetProject} from '@/api/category/projects'
+import {alertWarning} from '@/libs/view/common'
+
 
 export default {
 
@@ -185,6 +250,17 @@ export default {
 
   created () {
     this.handleGetDetail()
+  },
+
+  filters:{
+    parseTime (t) {
+      try{
+        return t.split(".")[0].replace('T',' ')
+      }
+      catch(err){
+      }
+    }
+
   },
 
   computed: {
@@ -202,17 +278,29 @@ export default {
     get_webssh_url: function () {
       let url = '/category/webssh/' + this.row.id + '/' + this.user
       return url
-    },
+    }
 
   },
 
   data () {
     return {
       row:{},
-      daq:'',
+      cronLogModal:false,
+      cronSyncModal:false,
+      cronlog:'',
+      project:'',
+      projects:[],
+      projectServers:[],
       user:'',
-      ssh_users:[],
-      sshuserModal:false,
+      updateCron:{
+        name:'',
+        content:''
+      },
+      indeterminate: true,
+      checkAll: false,
+      checkAllGroup: [],
+      changeCheckData: {},
+      checkValueAll:[],
       columnsUserList:[
         {
           title: 'ID',
@@ -234,7 +322,7 @@ export default {
           title: '项目名',
           key: 'name'
         }
-      ],
+      ]
 
     }
   },
@@ -244,17 +332,98 @@ export default {
       GetServer(this.$route.params.id)
         .then(res => {
           this.row = res.data
-          this.ssh_users = res.data.ssh_users
-          try {
-            this.daq = JSON.parse(res.data.daq)
-          } catch (err) {
-            console.log(err)
-            this.daq = ""
-          }
+          this.projects = res.data.projects
+          this.user = res.data.ssh_user.id
+          this.updateCron.name = res.data.ssh_user.name
+          this.updateCron.content = res.data.cron_content
         })
     },
 
+    handleFetchServerCron (name) {
+      let data = {name: name}
+      FetchServerCron(this.$route.params.id, data)
+        .then(res => {
+          this.updateCron.content = res.data.data
+        })
+    },
+
+    handleFetchServerCronLog() {
+      this.cronLogModal = true
+      let data = {count: 100}
+      FetchServerCronLog(this.$route.params.id, data)
+        .then(res => {
+          this.cronlog = res.data.data
+        })
+    },
+
+    handleUpdateServerCron () {
+      UpdateServerCron(this.$route.params.id, this.updateCron)
+        .then(res => {
+          console.log(res)
+          alertWarning('update', this.$Notice, res.data.name)
+        })
+    },
+
+    handleSyncServerCron () {
+      this.cronSyncModal = true
+
+    },
+
+    getProjectHosts (v) {
+      GetProject(v)
+        .then(res => {
+          let checkValueAll = []
+          let projectServers = []
+          for (let server of res.data.servers){
+            if (server.ssh_ip != this.row.ssh_ip){
+              checkValueAll.push(server.id)
+              projectServers.push(server)
+            }
+          }
+          this.checkValueAll = checkValueAll
+          this.projectServers = projectServers
+        })      
+    },
+
+    handleSyncCron () {
+      console.log(this.checkAllGroup)
+      let data = {servers: this.checkAllGroup}
+      SyncServerCron(this.$route.params.id, data)
+        .then(res => {
+          alertWarning('sync', this.$Notice, data.servers)
+        })
+    },
+
+    handleCheckAll () {
+      if (this.indeterminate) {
+        this.checkAll = false;
+      } else {
+        this.checkAll = !this.checkAll;
+      }
+      this.indeterminate = false;
+      if (this.checkAll) {
+        this.checkAllGroup = this.checkValueAll;
+      } else {
+        this.checkAllGroup = [];
+      }
+    },
+
+    checkAllGroupChange (data) {
+      let n = this.checkValueAll.length
+      if (data.length === n) {
+        this.indeterminate = false;
+        this.checkAll = true;
+      } else if (data.length > 0) {
+        this.indeterminate = true;
+        this.checkAll = false;
+      } else {
+        this.indeterminate = false;
+        this.checkAll = false;
+      }
+    },
+
   },
+
 
 }
 </script>
