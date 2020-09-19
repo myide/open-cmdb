@@ -33,8 +33,10 @@ Django rest framework + vue 的CMDB项目
 
 ## 部署
 - 推荐容器化部署
+```bash
 git pull myide/opencmdb:v1
 docker run -itd --name op1 --network host opencmdb:v1
+```
 
 
 ## 界面
