@@ -14,7 +14,7 @@ django==2.0.8
 django-celery==3.2.2
 djangorestframework-bulk==0.2.1
 django-guardian==1.4.9
-djangorestframework==3.8.2
+djangorestframework==3.9.1
 django-filter==2.0.0
 django-rest-swagger==2.1.1
 djangorestframework-jwt==1.11.0
