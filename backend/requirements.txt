@@ -9,7 +9,7 @@ uwsgi==2.0.17.1
 gunicorn==19.9.0
 channels==2.2.0
 python-ldap==3.2.0
-paramiko==2.7.1
+paramiko==2.10.1
 django==2.0.8
 django-celery==3.2.2
 djangorestframework-bulk==0.2.1
